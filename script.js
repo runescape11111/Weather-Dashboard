@@ -1,27 +1,29 @@
-var apiKey = "1f1b107e74f0a19a7dd0518bdd4c1ec6";
-var citySearch = document.querySelector("#city-search");
-var inputBox = document.querySelector("#input-box");
-var weatherDisplay = document.querySelector("#weather-display");
-var buttonList = document.querySelector("#previous");
-var previousSearch = [];
-var clearButton = document.querySelector("#clear-history");
+var apiKey = "1f1b107e74f0a19a7dd0518bdd4c1ec6"; //personal key for fetching data
+var citySearch = document.querySelector("#city-search"); //form for user search
+var inputBox = document.querySelector("#input-box");  //text input area
+var weatherDisplay = document.querySelector("#weather-display"); //area to show weather cards
+var buttonList = document.querySelector("#previous"); //empty div for buttons
+var previousSearch = []; //placeholder for search history
+var clearButton = document.querySelector("#clear-history"); //clear history button
 
+//on submitting the form
 citySearch.addEventListener("submit",function(event){
     event.preventDefault();
-    weatherDisplay.innerHTML = "";
+    weatherDisplay.innerHTML = ""; //clear previous weather cards
     userInput = inputBox.value;
-    inputBox.value = "";
+    inputBox.value = ""; //clear text input area
     getWeather(userInput);
 });
 
+//fetching weather data
 function getWeather(city) {
     var todayUrl = "HTTPS://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
     fetch(todayUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
-                printToday(data);
-                addSearch(data.name);
-                storeSearch(previousSearch);
+                printToday(data); //append weather card for today
+                addSearch(data.name); //add search term to search history if data fetched successfully
+                storeSearch(previousSearch); //local storage
                 printButton();
             });
         } else {
@@ -33,39 +35,47 @@ function getWeather(city) {
     fetch(forecastUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
-                printForecast(data.list);
+                printForecast(data.list); //append weather cards for forecast
             });
         } 
     });
 };
 
+//printing weather today
 function printToday(data) {
     var cardToday = document.createElement("div");
     cardToday.setAttribute("class","card bg-secondary my-2 py-2");
     
+    //weather icon
     var weatherIcon = document.createElement("img");
     weatherIcon.setAttribute("src","HTTPS://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png");
     weatherIcon.setAttribute("alt",data.weather[0].description);
     weatherIcon.setAttribute("style","height:80px;width:80px");
 
+    //title
     var cardTitle = document.createElement("h3");
     cardTitle.setAttribute("class","card-title px-2 ml-3 text-light font-weight-bold");
     cardTitle.textContent = data.name + " " + moment().format("L");
 
+    //style for all upcoming text
     var cardStyle = "card-text text-light px-2 py-1 ml-3 mb-2";
 
+    //temperature
     var temperature = document.createElement("h4");
     temperature.setAttribute("class",cardStyle);
     temperature.textContent = "Temperature: " + data.main.temp_min + " ~ " + data.main.temp_max + " °C, feels like " + data.main.feels_like + " °C";
 
+    //humidity
     var humidity = document.createElement("h4");
     humidity.setAttribute("class",cardStyle);
     humidity.textContent = "Humidity: " + data.main.humidity + "%";
 
+    //wind speed
     var windSpeed = document.createElement("h4");
     windSpeed.setAttribute("class",cardStyle);
     windSpeed.textContent = "Wind speed: " + data.wind.speed + " m/s " + windDirection(data.wind.deg);
 
+    //fetch data on UV index
     var uvUrl = "HTTPS://api.openweathermap.org/data/2.5/uvi?lat=" + data.coord.lat + "&lon=" + data.coord.lon + "&appid=" + apiKey;
 
     var uvIndex = document.createElement("h4");
@@ -75,6 +85,7 @@ function printToday(data) {
     fetch(uvUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
+                //assign a different class depending on UV index value to have a specified BG color
                 if (data.value<2) {
                     uvNum.setAttribute("class","uvlow");
                 } else if (data.value<5) {
@@ -107,6 +118,7 @@ function printToday(data) {
 
 };
 
+//printing 5-day forecast
 function printForecast(data){
     fiveDay = document.createElement("h3");
     fiveDay.textContent = "Forecast for the next 5 days";
@@ -116,6 +128,7 @@ function printForecast(data){
     var forecastRow = document.createElement("div");
     forecastRow.setAttribute("class", "row justify-content-between");
 
+    //five cards
     for (var i=7;i<40;i=i+7) {
         var forecastCard = document.createElement("div");
         forecastCard.setAttribute("class","col card bg-secondary my-2 py-1 forecast-card");
@@ -156,6 +169,7 @@ function printForecast(data){
     weatherDisplay.appendChild(forecastRow);
 };
 
+//function to check for wind direction
 function windDirection(deg) {
     var direction;
     if ((deg>=23) && (deg<=67)) {
@@ -178,34 +192,30 @@ function windDirection(deg) {
     return direction;
 };
 
+//local storage
 function storeSearch(input) {
     localStorage.setItem("weather locations", JSON.stringify(input));
 };
 
+//print buttong according to search history
 function printButton() {
     buttonList.innerHTML = "";
     for (var i=0;i<previousSearch.length;i++) {
         button = document.createElement("button");
         button.setAttribute("type","button");
         button.setAttribute("class","btn btn-dark my-1");
-        button.textContent = capitalize(previousSearch[i]);
+        button.textContent = capitalize(previousSearch[i]); //capitalize for good formatting
 
         buttonList.appendChild(button);
     };
 };
 
-function init() {
-    var storedSearch = JSON.parse(localStorage.getItem("weather locations"));
-    if (storedSearch !== null) {
-      previousSearch = storedSearch;
-      printButton();
-    }
-};
-
+//capitalize first letter
 function capitalize(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
+//when clicking on buttons for search history
 buttonList.addEventListener("click",function(event) {
     element = event.target;
     
@@ -216,21 +226,32 @@ buttonList.addEventListener("click",function(event) {
     };
 });
 
+//button to clear history
 clearButton.addEventListener("click",function() {
     previousSearch = [];
     localStorage.clear();
     printButton();
 });
 
+//conditions to add search term to search history
 function addSearch(cityName) {
-    if (previousSearch.length) {
-        if (!previousSearch.includes(cityName)) {
+    if (previousSearch.length) { //if the previous search isn't empty
+        if (!previousSearch.includes(cityName)) { //if search term isn't already recorded
             previousSearch.push(cityName);
         }
     } else {
         previousSearch.push(cityName);
     };
     
+};
+
+//initialize when page reloads
+function init() {
+    var storedSearch = JSON.parse(localStorage.getItem("weather locations")); //retrieve from local storage
+    if (storedSearch !== null) { //if there's data stored
+      previousSearch = storedSearch; //update search history and generate buttons
+      printButton();
+    }
 };
 
 init();
