@@ -10,19 +10,8 @@ citySearch.addEventListener("submit",function(event){
     event.preventDefault();
     weatherDisplay.innerHTML = "";
     userInput = inputBox.value;
+    inputBox.value = "";
     getWeather(userInput);
-
-    //add search to array IF not already in there
-    if (previousSearch.length) {
-        if (!previousSearch.includes(userInput)) {
-            previousSearch.push(userInput);
-        }
-    } else {
-        previousSearch.push(userInput);
-    };
-
-    storeSearch(previousSearch);
-    printButton();
 });
 
 function getWeather(city) {
@@ -31,6 +20,9 @@ function getWeather(city) {
         if(response.ok) {
             response.json().then(function(data) {
                 printToday(data);
+                addSearch(data.name);
+                storeSearch(previousSearch);
+                printButton();
             });
         } else {
             weatherDisplay.textContent = "Invalid city";
@@ -208,13 +200,11 @@ function init() {
       previousSearch = storedSearch;
       printButton();
     }
-}
+};
 
 function capitalize(str) {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
-
-init();
 
 buttonList.addEventListener("click",function(event) {
     element = event.target;
@@ -230,4 +220,17 @@ clearButton.addEventListener("click",function() {
     previousSearch = [];
     localStorage.clear();
     printButton();
-})
+});
+
+function addSearch(cityName) {
+    if (previousSearch.length) {
+        if (!previousSearch.includes(cityName)) {
+            previousSearch.push(cityName);
+        }
+    } else {
+        previousSearch.push(cityName);
+    };
+    
+};
+
+init();
