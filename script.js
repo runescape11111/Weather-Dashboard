@@ -2,22 +2,34 @@ var apiKey = "1f1b107e74f0a19a7dd0518bdd4c1ec6";
 var citySearch = document.querySelector("#city-search");
 var inputBox = document.querySelector("#input-box");
 var weatherDisplay = document.querySelector("#weather-display");
+var buttonList = document.querySelector("#previous");
 var previousSearch = [];
+var clearButton = document.querySelector("#clear-history");
 
 citySearch.addEventListener("submit",function(event){
     event.preventDefault();
     weatherDisplay.innerHTML = "";
     userInput = inputBox.value;
     getWeather(userInput);
+
     //add search to array IF not already in there
+    if (previousSearch.length) {
+        if (!previousSearch.includes(userInput)) {
+            previousSearch.push(userInput);
+        }
+    } else {
+        previousSearch.push(userInput);
+    };
+
+    storeSearch(previousSearch);
+    printButton();
 });
 
 function getWeather(city) {
-    var todayUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
+    var todayUrl = "HTTPS://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
     fetch(todayUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
-                console.log(data);
                 printToday(data);
             });
         } else {
@@ -25,11 +37,10 @@ function getWeather(city) {
         }
     });
     
-    var forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid="+apiKey + "&units=metric";
+    var forecastUrl = "HTTPS://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid="+apiKey + "&units=metric";
     fetch(forecastUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
-                console.log(data);
                 printForecast(data.list);
             });
         } 
@@ -41,7 +52,7 @@ function printToday(data) {
     cardToday.setAttribute("class","card bg-secondary my-2 py-2");
     
     var weatherIcon = document.createElement("img");
-    weatherIcon.setAttribute("src","http://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png");
+    weatherIcon.setAttribute("src","HTTPS://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png");
     weatherIcon.setAttribute("alt",data.weather[0].description);
     weatherIcon.setAttribute("style","height:80px;width:80px");
 
@@ -63,7 +74,7 @@ function printToday(data) {
     windSpeed.setAttribute("class",cardStyle);
     windSpeed.textContent = "Wind speed: " + data.wind.speed + " m/s " + windDirection(data.wind.deg);
 
-    var uvUrl = "https://api.openweathermap.org/data/2.5/uvi?lat=" + data.coord.lat + "&lon=" + data.coord.lon + "&appid=" + apiKey;
+    var uvUrl = "HTTPS://api.openweathermap.org/data/2.5/uvi?lat=" + data.coord.lat + "&lon=" + data.coord.lon + "&appid=" + apiKey;
 
     var uvIndex = document.createElement("h4");
     uvIndex.setAttribute("class",cardStyle);
@@ -113,7 +124,7 @@ function printForecast(data){
     var forecastRow = document.createElement("div");
     forecastRow.setAttribute("class", "row justify-content-between");
 
-    for (i=7;i<40;i=i+7) {
+    for (var i=7;i<40;i=i+7) {
         var forecastCard = document.createElement("div");
         forecastCard.setAttribute("class","col card bg-secondary my-2 py-1 forecast-card");
 
@@ -122,7 +133,7 @@ function printForecast(data){
         forecastTitle.textContent = moment().add((i+1)/7,"day").format("L");
 
         var weatherIcon = document.createElement("img");
-        weatherIcon.setAttribute("src","http://openweathermap.org/img/wn/" + data[i].weather[0].icon + ".png");
+        weatherIcon.setAttribute("src","HTTPS://openweathermap.org/img/wn/" + data[i].weather[0].icon + ".png");
         weatherIcon.setAttribute("alt",data[i].weather[0].description);
         weatherIcon.setAttribute("style","height:60px;width:60px");
 
@@ -174,3 +185,49 @@ function windDirection(deg) {
     };
     return direction;
 };
+
+function storeSearch(input) {
+    localStorage.setItem("weather locations", JSON.stringify(input));
+};
+
+function printButton() {
+    buttonList.innerHTML = "";
+    for (var i=0;i<previousSearch.length;i++) {
+        button = document.createElement("button");
+        button.setAttribute("type","button");
+        button.setAttribute("class","btn btn-dark my-1");
+        button.textContent = capitalize(previousSearch[i]);
+
+        buttonList.appendChild(button);
+    };
+};
+
+function init() {
+    var storedSearch = JSON.parse(localStorage.getItem("weather locations"));
+    if (storedSearch !== null) {
+      previousSearch = storedSearch;
+      printButton();
+    }
+}
+
+function capitalize(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+
+init();
+
+buttonList.addEventListener("click",function(event) {
+    element = event.target;
+    
+    if (element.matches(".btn")) {
+        weatherDisplay.innerHTML = "";
+        userInput = element.textContent;
+        getWeather(userInput);
+    };
+});
+
+clearButton.addEventListener("click",function() {
+    previousSearch = [];
+    localStorage.clear();
+    printButton();
+})
