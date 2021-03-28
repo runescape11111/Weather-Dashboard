@@ -9,6 +9,7 @@ citySearch.addEventListener("submit",function(event){
     weatherDisplay.innerHTML = "";
     userInput = inputBox.value;
     getWeather(userInput);
+    //add search to array IF not already in there
 });
 
 function getWeather(city) {
@@ -16,6 +17,7 @@ function getWeather(city) {
     fetch(todayUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
+                console.log(data);
                 printToday(data);
             });
         } else {
@@ -27,6 +29,7 @@ function getWeather(city) {
     fetch(forecastUrl).then(function(response) {
         if(response.ok) {
             response.json().then(function(data) {
+                console.log(data);
                 printForecast(data.list);
             });
         } 
@@ -39,7 +42,7 @@ function printToday(data) {
     
     var weatherIcon = document.createElement("img");
     weatherIcon.setAttribute("src","http://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png");
-    weatherIcon.setAttribute("alt","weather icon");
+    weatherIcon.setAttribute("alt",data.weather[0].description);
     weatherIcon.setAttribute("style","height:80px;width:80px");
 
     var cardTitle = document.createElement("h3");
@@ -120,7 +123,7 @@ function printForecast(data){
 
         var weatherIcon = document.createElement("img");
         weatherIcon.setAttribute("src","http://openweathermap.org/img/wn/" + data[i].weather[0].icon + ".png");
-        weatherIcon.setAttribute("alt","weather icon");
+        weatherIcon.setAttribute("alt",data[i].weather[0].description);
         weatherIcon.setAttribute("style","height:60px;width:60px");
 
         var cardStyle = "card-text text-light py-1 my-1";
