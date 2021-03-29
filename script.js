@@ -60,7 +60,7 @@ function printToday(data) {
     todayRow.setAttribute("class", "row justify-content-center mx-0");
 
     var cardToday = document.createElement("div");
-    cardToday.setAttribute("class","col card bg-secondary my-2 mx-3 py-2");
+    cardToday.setAttribute("class","col card bg-secondary my-3 mx-3 py-2");
     
     //weather icon
     var weatherIcon = document.createElement("img");
@@ -139,7 +139,7 @@ function printToday(data) {
 function printForecast(data){
     fiveDay = document.createElement("h3");
     fiveDay.textContent = "Forecast for the next 5 days";
-    fiveDay.setAttribute("class","text-dark font-weight-bold mt-2 px-3");
+    fiveDay.setAttribute("class","text-dark font-weight-bold px-3");
     weatherDisplay.appendChild(fiveDay);
 
     var forecastRow = document.createElement("div");
