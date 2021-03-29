@@ -15,6 +15,17 @@ citySearch.addEventListener("submit",function(event){
     getWeather(userInput);
 });
 
+//on pressing enter key
+citySearch.addEventListener("keypress",function(event){
+    if(event.keyCode === 13){
+        event.preventDefault();
+        weatherDisplay.innerHTML = ""; //clear previous weather cards
+        userInput = inputBox.value;
+        inputBox.value = ""; //clear text input area
+        getWeather(userInput);
+    }
+});
+
 //fetching weather data
 function getWeather(city) {
     var todayUrl = "HTTPS://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey + "&units=metric";
