@@ -43,8 +43,12 @@ function getWeather(city) {
 
 //printing weather today
 function printToday(data) {
+
+    var todayRow = document.createElement("div");
+    todayRow.setAttribute("class", "row justify-content-center mx-0");
+
     var cardToday = document.createElement("div");
-    cardToday.setAttribute("class","card bg-secondary my-2 py-2");
+    cardToday.setAttribute("class","col card bg-secondary my-2 mx-3 py-2");
     
     //weather icon
     var weatherIcon = document.createElement("img");
@@ -114,7 +118,8 @@ function printToday(data) {
     cardToday.appendChild(windSpeed);
     cardToday.appendChild(uvIndex);
 
-    weatherDisplay.appendChild(cardToday);
+    todayRow.appendChild(cardToday)
+    weatherDisplay.appendChild(todayRow);
 
 };
 
@@ -122,27 +127,31 @@ function printToday(data) {
 function printForecast(data){
     fiveDay = document.createElement("h3");
     fiveDay.textContent = "Forecast for the next 5 days";
-    fiveDay.setAttribute("class","text-dark font-weight-bold mt-1");
+    fiveDay.setAttribute("class","text-dark font-weight-bold mt-2 px-3");
     weatherDisplay.appendChild(fiveDay);
 
     var forecastRow = document.createElement("div");
-    forecastRow.setAttribute("class", "row justify-content-between");
+    forecastRow.setAttribute("class", "row justify-content-center mx-0");
 
     //five cards
     for (var i=7;i<40;i=i+7) {
+        var forecastColumn = document.createElement("div");
+        forecastColumn.setAttribute("class","col-12 col-xl mx-0 px-0");
+
         var forecastCard = document.createElement("div");
-        forecastCard.setAttribute("class","col card bg-secondary my-2 py-1 forecast-card");
+        forecastCard.setAttribute("class","card bg-secondary py-1 forecast-card my-3");
 
         var forecastTitle = document.createElement("h4");
-        forecastTitle.setAttribute("class","card-title text-light font-weight-bold mt-2 mb-0");
+        forecastTitle.setAttribute("class","card-title text-light font-weight-bold mt-2 mb-0 ml-3");
         forecastTitle.textContent = moment().add((i+1)/7,"day").format("L");
 
         var weatherIcon = document.createElement("img");
         weatherIcon.setAttribute("src","HTTPS://openweathermap.org/img/wn/" + data[i].weather[0].icon + ".png");
         weatherIcon.setAttribute("alt",data[i].weather[0].description);
         weatherIcon.setAttribute("style","height:60px;width:60px");
+        weatherIcon.setAttribute("class","ml-3");
 
-        var cardStyle = "card-text text-light py-1 my-1";
+        var cardStyle = "card-text text-light py-1 my-1 ml-3";
 
         var temperature = document.createElement("h6");
         temperature.setAttribute("class",cardStyle);
@@ -163,7 +172,8 @@ function printForecast(data){
         forecastCard.appendChild(humidity);
         forecastCard.appendChild(windSpeed);
 
-        forecastRow.appendChild(forecastCard);
+        forecastColumn.appendChild(forecastCard);
+        forecastRow.appendChild(forecastColumn);
     };
 
     weatherDisplay.appendChild(forecastRow);
