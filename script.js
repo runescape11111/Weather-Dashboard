@@ -36,19 +36,20 @@ function getWeather(city) {
                 addSearch(data.name); //add search term to search history if data fetched successfully
                 storeSearch(previousSearch); //local storage
                 printButton();
+                
+                //so that the forecast always gets fetched after the data for today
+                var forecastUrl = "HTTPS://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid="+apiKey + "&units=metric";
+                fetch(forecastUrl).then(function(response) {
+                    if(response.ok) {
+                        response.json().then(function(data) {
+                            printForecast(data.list); //append weather cards for forecast
+                        });
+                    } 
+                });
             });
         } else {
             weatherDisplay.textContent = "Invalid city";
         }
-    });
-    
-    var forecastUrl = "HTTPS://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid="+apiKey + "&units=metric";
-    fetch(forecastUrl).then(function(response) {
-        if(response.ok) {
-            response.json().then(function(data) {
-                printForecast(data.list); //append weather cards for forecast
-            });
-        } 
     });
 };
 
